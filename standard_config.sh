@@ -12,3 +12,4 @@
 #SBATCH --error slurm.%N.%j.err         # Error file name and Location
 
 # PLACE CODE HERE
+/bin/hostname

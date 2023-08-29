@@ -10,6 +10,6 @@ The ***configs/*** directory contains example configurations using `#SBATCH` opt
 
 ## Examples
 
-Additional examples are organized in the other folders, please read through each `README.md` file in each folder to understand each example.
+Additional examples can be found in the **examples/** folder, please read through each `README.md` file in each to understand each example.
 
 ## Additional Examples/Configurations - COMING SOON

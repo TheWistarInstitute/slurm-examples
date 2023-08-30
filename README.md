@@ -6,7 +6,7 @@ Examples of using Slurm at The Wistar Institute.
 
 ## Configurations
 
-The ***configs/*** directory contains example configurations using `#SBATCH` options. These are separated between Standard, CPU, GPU, and Memory intensive jobs. These can be modified to your specific needs, but should always contain standard `#SBATCH` options such as job name, tasks, time, output. 
+The ***configs/*** directory contains example configurations using `#SBATCH` options. These are separated between Standard, CPU, GPU, and Memory intensive jobs. These can be modified to your specific needs, but should always contain standard `#SBATCH` options such as job name, tasks, time, output.
 
 ## Examples
 

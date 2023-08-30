@@ -8,7 +8,7 @@ An array job allows you to submit and manage many related jobs as a unit.  A sub
 
 Add the `--array` option and a sequence of numbers to use for indices:
 
-```
+```bash
 sbatch --array=1-10 ... other sbatch options ...
 ```
 
@@ -24,9 +24,9 @@ This will submit an array of 10 jobs- each task within this job array will have 
 
 Task details are available in the job's environment:
 
- - SLURM_ARRAY_TASK_ID: the task "rank"
- - SLURM_ARRAY_JOB_ID: the ID of the master job.
- - SLURM_ARRAY_TASK_COUNT: the number of tasks in the job array
+- SLURM_ARRAY_TASK_ID: the task "rank"
+- SLURM_ARRAY_JOB_ID: the ID of the master job.
+- SLURM_ARRAY_TASK_COUNT: the number of tasks in the job array
 
 The example `01.sh` contains examples of how these can be accessed in the submitted job.
 

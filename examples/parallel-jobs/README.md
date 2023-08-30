@@ -1,9 +1,5 @@
 # Job Parallelization
 
-## Overview
-
-## How to use parallelization
-
 ## Index of Examples
 
 > All of the contained examples have default arguments in the scripts- so these

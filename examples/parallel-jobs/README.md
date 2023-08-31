@@ -10,7 +10,7 @@
 
 Here `--cpus-per-task` should be no more than the number of cores on a node in the partition you request. You may want to experiment with the number of thread for your job to determine the optimal number, as computation speed does not always increase with more threads.
 
-Note that if ``--cpus-per-task` is fewer than the number of cores on a node, your job will not make full use of the node. Strictly speaking the defaults will be set to 1 node and 1 task per node.
+Note that if `--cpus-per-task` is fewer than the number of cores on a node, your job will not make full use of the node. Strictly speaking the defaults will be set to 1 node and 1 task per node.
 
 ### simple-multicore.sh
 

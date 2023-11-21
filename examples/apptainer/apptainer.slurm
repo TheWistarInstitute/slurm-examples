@@ -12,4 +12,5 @@
 #SBATCH --error slurm.%N.%j.err         # Error file name and Location
 
 module load apptainer
-apptainer exec python.sif my_script.py <args>
+apptainer pull docker://python
+apptainer exec python.sif main.py <args>

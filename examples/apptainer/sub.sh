@@ -11,6 +11,20 @@
 #SBATCH --output slurm.%N.%j.out        # Output file name and Location
 #SBATCH --error slurm.%N.%j.err         # Error file name and Location
 
+# Load the apptainer module
 module load apptainer
-apptainer pull docker://python
-apptainer exec python.sif main.py <args>
+
+# Pull Image
+apptainer pull docker://<image>
+
+# OR Build Image
+# if the .sif file does not exist, build it
+# to be used with job arrays, so container is not rebuilt each time
+if ! test -f container.sif; then
+  echo "Container does not exist...building"
+  apptainer build container.sif recipe.def
+fi
+
+
+# execute command within image
+apptainer exec container.sif <command>

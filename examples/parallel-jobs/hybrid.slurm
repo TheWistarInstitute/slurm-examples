@@ -2,9 +2,6 @@
 # Job name:
 #SBATCH --job-name=hybrid-job
 #
-# Account:
-#SBATCH --account=wistar
-#
 # Partition:
 #SBATCH --partition=defq
 #

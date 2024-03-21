@@ -2,9 +2,6 @@
 # Job name:
 #SBATCH --job-name=simple-multicore-job
 #
-# Account:
-#SBATCH --account=wistar
-#
 # Partition:
 #SBATCH --partition=defq
 #

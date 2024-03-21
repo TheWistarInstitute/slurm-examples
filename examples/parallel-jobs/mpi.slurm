@@ -2,9 +2,6 @@
 # Job name:
 #SBATCH --job-name=mpi-job
 #
-# Account:
-#SBATCH --account=wistar
-#
 # Partition:
 #SBATCH --partition=defq
 #

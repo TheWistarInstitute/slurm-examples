@@ -75,7 +75,7 @@ output=`sed -n "$SLURM_ARRAY_TASK_ID"p input.txt |  awk '{print $2}'`
 python fibonacci.py $input >> $output
 ```
 
-For example, the first iteration would be evaluated in this order
+For example, the first iteration would be evaluated in this order:
 ```bash
 # first iteration
 input=`sed -n "$SLURM_ARRAY_TASK_ID"p input.txt |  awk '{print $1}'`

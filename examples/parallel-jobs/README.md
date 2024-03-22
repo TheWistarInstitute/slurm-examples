@@ -1,33 +1,94 @@
 # Job Parallelization
 
-## Index of Examples
+Running in parallel in the WI-HPC cluster can be achieved in multiple ways. This is ideal when wanting to run several **independent** jobs.
 
-> All of the contained examples have default arguments in the scripts- so these
-> can be run just with `sbatch <script_name>`.  Any arguments you use in the
-> command line will override those built into the script
+Please note that in order to run multiple independent jobs, you **must** request more than one task, i.e `--ntasks=3`.
 
-### threaded-job.sh
+## Method 1
 
-Here `--cpus-per-task` should be no more than the number of cores on a node in the partition you request. You may want to experiment with the number of thread for your job to determine the optimal number, as computation speed does not always increase with more threads.
+The first example, `sub1.sh` requests 3 tasks and runs 3 independent `srun` commands. In the `srun` commands we assign 1 task to each command for a total of 3 tasks.
 
-Note that if `--cpus-per-task` is fewer than the number of cores on a node, your job will not make full use of the node. Strictly speaking the defaults will be set to 1 node and 1 task per node.
+Please note the `&` at the each of end line. This `AND` operator allows all 3 commands to start at the same time.
 
-### simple-multicore.sh
+Using the `&&` operator will wait until the first command to execute. If and only if it is successful, the second command will then start.
+```bash
+#!/bin/bash
+# Parallel Job Example
 
-This job script would be appropriate for multi-core R, Python, or MATLAB jobs. In the commands that launch your code and/or within your code itself, you can reference the `SLURM_NTASKS` environment variable to dynamically identify how many tasks(i.e. processing units) are available to you.
+# standard job submission options
+#SBATCH --job-name=parallel             # create a short name for your job
+#SBATCH --mail-type=begin,end,fail      # send email when job begins,ends,fails
+#SBATCH --mail-user=username@wistar.org # email to send alerts to
+#SBATCH --output slurm.%N.%j.out        # Output file name and Location
+#SBATCH --error slurm.%N.%j.err         # Error file name and Location
 
-Here the number of CPUs used by your code at any given time should be no more than the number of cores on a node (~48 cores).
+# parallelization dependent options
+#SBATCH --time=01:00:00                 # total run time limit (HH:MM:SS)
+#SBATCH --partition=defq                # shared partition (queue)
+#SBATCH --ntasks=3                      # total number of tasks across all nodes
+#SBATCH --cpus-per-task=1               # cpu-cores per task (>1 if multi-threaded tasks)
+#SBATCH --mem-per-cpu=1GB               # total memory allocated for all tasks
 
-### mpi.sh
+module load Python/3.10.4-GCCcore-11.3.0
 
-You should set the number of tasks to be a multiple of the number of cores per node in that partition, thereby making use of all the cores on the node(s) to which your job is assigned.
+srun --ntasks=$SLURM_NTASKS python fibonacci.py 10 &
+srun --ntasks=$SLURM_NTASKS python fibonacci.py 20 &
+srun --ntasks=$SLURM_NTASKS python fibonacci.py 30 &
+wait
+```
 
-This example assumes that each task will use a single core; otherwise there could be resource contention amongst the tasks assigned to a node.
+## Method 2 (Preferred)
 
-### alt-mpi.sh
+The second example, `sub2.sh` uses and array to submit the job multiple times (without having to add additional `srun` commands).
 
-This alternative explicitly specifies the number of nodes, tasks per node, and CPUs per task rather than simply specifying the number of tasks and having SLURM determine the resources needed. As before, one would generally when the number of tasks per node to equal a multiple of the number of cores on a node, assuming only 1 CPU per task.
+This methods also uses the `sed` and `awk` commands.
+- `sed`: uses the current sub job ID to iterate through the lines of `input2.txt` and return the row's value.
+- `awk`: returns the specified column value (`$1` is the first column and `$2` is the second column).
 
-### hybrid.sh
+```bash
+#!/bin/bash
+# Parallel Job Example
 
-Here we request a total of 8 (= 2 x 4) MPI tasks, with 5 cores per task. This would make us of 40 cores in total (= 2 x 4 x 5) split across 2 nodes.
+# standard job submission options
+#SBATCH --job-name=parallel             # create a short name for your job
+#SBATCH --mail-type=begin,end,fail      # send email when job begins,ends,fails
+#SBATCH --mail-user=username@wistar.org # email to send alerts to
+#SBATCH --output slurm.%N.%j.out        # Output file name and Location
+#SBATCH --error slurm.%N.%j.err         # Error file name and Location
+
+# parallelization dependent options
+#SBATCH --time=01:00:00                 # total run time limit (HH:MM:SS)
+#SBATCH --partition=defq                # shared partition (queue)
+#SBATCH --ntasks=3                      # total number of tasks across all nodes
+#SBATCH --cpus-per-task=1               # cpu-cores per task (>1 if multi-threaded tasks)
+#SBATCH --mem-per-cpu=1GB               # total memory allocated for all tasks
+#SBATCH --array=1-12%3                  # job array from 1 - 12 with step 3 (3 sub jobs at a time)
+
+module load Python/3.10.4-GCCcore-11.3.0
+
+input=`sed -n "$SLURM_ARRAY_TASK_ID"p input.txt |  awk '{print $1}'`
+output=`sed -n "$SLURM_ARRAY_TASK_ID"p input.txt |  awk '{print $2}'`
+
+python fibonacci.py $input >> $output
+```
+
+For example, the first iteration would be evaluated in this order
+```bash
+# first iteration
+input=`sed -n "$SLURM_ARRAY_TASK_ID"p input.txt |  awk '{print $1}'`
+output=`sed -n "$SLURM_ARRAY_TASK_ID"p input.txt |  awk '{print $2}'`
+
+# evaluate the $SLURM_ARRAY_TASK_ID environment variable
+input=`sed -n 1p input.txt |  awk '{print $1}'`
+output=`sed -n 1p input.txt |  awk '{print $2}'`
+
+# use sed to get the current row
+input=`10 10.out | awk '{print $1}'`
+output=`10 10.out | awk '{print $2}'`
+
+# use awk to separate columns into different variables
+input=10
+output=10.out
+```
+
+This process repeats itself in sets of 3, 4 separate times, for a total of 12 sub jobs. (`#SBATCH --array=1-12%3`) 

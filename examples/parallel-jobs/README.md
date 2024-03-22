@@ -11,6 +11,7 @@ The first example, `sub1.sh` requests 3 tasks and runs 3 independent `srun` comm
 Please note the `&` at the each of end line. This `AND` operator allows all 3 commands to start at the same time.
 
 Using the `&&` operator will wait until the first command to execute. If and only if it is successful, the second command will then start.
+
 ```bash
 #!/bin/bash
 # Parallel Job Example
@@ -31,15 +32,17 @@ Using the `&&` operator will wait until the first command to execute. If and onl
 
 module load Python/3.10.4-GCCcore-11.3.0
 
-srun --ntasks=$SLURM_NTASKS python fibonacci.py 10 &
-srun --ntasks=$SLURM_NTASKS python fibonacci.py 20 &
-srun --ntasks=$SLURM_NTASKS python fibonacci.py 30 &
+srun --ntasks=$SLURM_NTASKS python fibonacci.py 10 >> 10.out &
+srun --ntasks=$SLURM_NTASKS python fibonacci.py 20 >> 20.out &
+srun --ntasks=$SLURM_NTASKS python fibonacci.py 30 >> 30.out &
 wait
 ```
 
 ## Method 2 (Preferred)
 
 The second example, `sub2.sh` uses and array to submit the job multiple times (without having to add additional `srun` commands).
+
+This is the preferred method as simple adding new lines to the input.txt file and increasing the array size and step will work. Whereas, in **Method 1** you would need to add many more `srun` commands and manually specify each input and output value.
 
 This methods also uses the `sed` and `awk` commands.
 - `sed`: uses the current sub job ID to iterate through the lines of `input2.txt` and return the row's value.

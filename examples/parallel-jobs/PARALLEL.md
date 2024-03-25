@@ -75,23 +75,37 @@ output=`sed -n "$SLURM_ARRAY_TASK_ID"p input.txt |  awk '{print $2}'`
 python fibonacci.py $input >> $output
 ```
 
-For example, the first iteration would be evaluated in this order:
+If our input.txt file looks like:
+```
+10  10.out
+20  20.out
+30  30.out
+40  10.out
+50  20.out
+60  30.out
+70  10.out
+80  20.out
+90  30.out
+100 10.out
+110 110.out
+120 120.out
+```
+
+The first iteration (i.e. $SLURM_ARRAY_TASK_ID = 1), the input and output variables are evaluated to:
 ```bash
-# first iteration
-input=`sed -n "$SLURM_ARRAY_TASK_ID"p input.txt |  awk '{print $1}'`
-output=`sed -n "$SLURM_ARRAY_TASK_ID"p input.txt |  awk '{print $2}'`
-
-# evaluate the $SLURM_ARRAY_TASK_ID environment variable
-input=`sed -n 1p input.txt |  awk '{print $1}'`
-output=`sed -n 1p input.txt |  awk '{print $2}'`
-
-# use sed to get the current row
-input=`10 10.out | awk '{print $1}'`
-output=`10 10.out | awk '{print $2}'`
-
-# use awk to separate columns into different variables
 input=10
 output=10.out
 ```
 
-This process repeats itself in sets of 3, 4 separate times, for a total of 12 sub jobs. (`#SBATCH --array=1-12%3`) 
+And the fifth iteration (i.e. $SLURM_ARRAY_TASK_ID = 5), the input and output variables are evaluated to:
+```bash
+input=50
+output=50.out
+```
+
+And so fourth.
+
+This array runs a total of 12 sub jobs, 3 at a time. (`#SBATCH --array=1-12%3`)
+
+Please note, as soon as 1 sub jobs completes, the next one starts. In other words, if 1, 2, and 3 all start at the same time, then 1 completes, 4 will then start (even if 2 and 3 are still running).
+
